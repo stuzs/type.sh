@@ -13,9 +13,26 @@ rm $TYPED_FILE 2> /dev/null
 if [ "$1" != "-r" ] || [ ! -f $TOTYPE_FILE ] ; then
  rm $TOTYPE_FILE 2> /dev/null
  words_total=$(wc -l $DICT_FILE | cut -f1 -d" ")
+ found_quote=0
  for ((i=0; i<10; i++)); do
-  rand_num=$(expr $RANDOM '*' $RANDOM % $words_total)
-  echo "$(head -n$rand_num $DICT_FILE | tail -n1)" >> $TOTYPE_FILE
+  rand_num=$(expr '(' $RANDOM '*' $RANDOM '+' $RANDOM  ')' % $words_total)
+  rand_word="$(head -n$rand_num $DICT_FILE | tail -n1)"
+  if [[ $(echo $rand_word | grep -P "[\x80-\xff]") ]]; then  # for accented
+   printf "$rand_word in dictionary skipped\n" >&2
+   let i=$i-1
+  else
+   if [[ $rand_word =~ \' ]]; then  # for too many quotes appearing
+    let found_quote=$found_quote+1
+    if [[ $found_quote -gt 3 ]] ; then
+     printf "$rand_word in dictionary skipped\n" >&2
+     let i=$i-1
+    else
+     echo $rand_word >> $TOTYPE_FILE
+    fi
+   else
+    echo $rand_word >> $TOTYPE_FILE
+   fi
+  fi
  done
 fi
 
