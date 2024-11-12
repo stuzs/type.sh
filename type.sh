@@ -8,6 +8,7 @@
 DICT_FILE='/usr/share/dict/words'
 TOTYPE_FILE='./totype.sav.txt'
 TYPED_FILE='./typed.sav.txt'
+PUNCT_STR="...,,,,-\";:!"  # define your own punctuation list here
 
 rm $TYPED_FILE 2> /dev/null
 if [ "$1" != "-r" ] || [ ! -f $TOTYPE_FILE ] ; then
@@ -30,6 +31,12 @@ if [ "$1" != "-r" ] || [ ! -f $TOTYPE_FILE ] ; then
      echo $rand_word >> $TOTYPE_FILE
     fi
    else
+    rn=$RANDOM
+    if [ $rn -gt 27000 ]; then  # punctuation possibility=(32767-27000)/32768
+     punct_pos=$(expr $rn % ${#PUNCT_STR} )
+     punct_char=${PUNCT_STR:$punct_pos:1}
+     rand_word=$(echo ${rand_word}${punct_char})
+    fi
     echo $rand_word >> $TOTYPE_FILE
    fi
   fi
