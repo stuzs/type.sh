@@ -14,7 +14,7 @@ if [ "$1" != "-r" ] || [ ! -f $TOTYPE_FILE ] ; then
  rm $TOTYPE_FILE 2> /dev/null
  words_total=$(wc -l $DICT_FILE | cut -f1 -d" ")
  for ((i=0; i<10; i++)); do
-  rand_num=$(expr $RANDOM '*' $RANDOM % $words_total)
+  rand_num=$(expr $RANDOM '*' $RANDOM % $words_total '+' '1')
   echo "$(head -n$rand_num $DICT_FILE | tail -n1)" >> $TOTYPE_FILE
  done
 fi
